@@ -1,3 +1,21 @@
+[server]
+# Disable file watcher to avoid thread creation in container
+fileWatcherType = "none"
+# Allow connections from all interfaces
+address = "0.0.0.0"
+# Headless mode for containerized environments
+headless = true
+# Disable automatic reruns on file changes
+runOnSave = false
+
+[logger]
+# Reduce logging to avoid threading issues
+level = "warning"
+
+[client]
+# Disable sidebar navigation prompt
+showSidebarNavigation = true
+
 [theme]
 primaryColor = "#A288B3"  # Set the primary color (e.g., slider, buttons)
 backgroundColor = "#F5F5F5"  # Set the background color

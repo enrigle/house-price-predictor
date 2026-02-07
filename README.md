@@ -94,7 +94,7 @@ Access the MLflow UI at [http://localhost:5555](http://localhost:5555)
 If you prefer an interactive experience, launch JupyterLab with:
 
 ```bash
-uv python -m jupyterlab
+uv pip install jupyterlab
 # or
 python -m jupyterlab
 ```
@@ -148,7 +148,7 @@ Once you have launched both the apps, you should be able to access streamlit web
 You could also test predictions with FastAPI directly using 
 
 ```
-curl -X POST "http://localhost:8000/predict" \
+curl -X POST "http://localhost:55001/predict" \
 -H "Content-Type: application/json" \
 -d '{
   "sqft": 1500,
@@ -156,7 +156,7 @@ curl -X POST "http://localhost:8000/predict" \
   "bathrooms": 2,
   "location": "suburban",
   "year_built": 2000,
-  "condition": fair
+  "condition": "Fair"
 }'
 
 ```

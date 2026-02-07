@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fastapi:v2
+    container_name: fastapi
+    ports:
+      - "8000:8000"
+    environment:
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+      NUMEXPR_NUM_THREADS: 1
+      BLAS_NUM_THREADS: 1
+    ulimits:
+      nproc: 65535
+      nofile: 65535
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  streamlit:
+    init: true
+    privileged: true
+    build:
+      context: ./streamlit_app
+      dockerfile: Dockerfile
+    image: streamlit:v1
+    container_name: streamlit
+    ports:
+      - "8501:8501"
+    ulimits:
+      nproc: 65535
+      nofile: 65535
+    pids_limit: -1
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      API_URL: http://fastapi:8000
+      STREAMLIT_SERVER_HEADLESS: "true"
+      STREAMLIT_SERVER_FILE_WATCHER_TYPE: "none"
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+      NUMEXPR_NUM_THREADS: 1
+    volumes:
+      - ./streamlit_app/.streamlit/config.toml:/app/.streamlit/config.toml
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - fastapi
+
+networks:
+  app-network:
+    driver: bridge

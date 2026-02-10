@@ -24,3 +24,38 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
+    - name: Run Data Preprocessing
+      run: |
+        python src/data/run_preprocessing.py \
+          --input_path data/raw/housing.csv \
+          --output_path data/processed/cleaned_house_data.csv
+
+    - name: Do Feature Engineering
+      run: |
+        python src/features/engineer.py \
+          --input_path data/processed/cleaned_house_data.csv \
+          --output_path data/processed/feature_house_data.csv \
+          --preprocessor models/preprocessor.pkl
+
+    - name: Setup MLflow
+      run: |
+        docker pull ghcr.io/mlflow/mlflow:latest
+        docker run -d -p 5555:5000 --name mlflow-server ghcr.io/mlflow/mlflow:latest \
+          mlflow server --host 0.0.0.0 \
+          --backend-store-uri sqlite:///mlflow.db 
+          --default-artifact-root /tmp/mlruns
+
+    - name: Train Model
+      run: |
+        python src/models/train.py \
+          --config  configs/model_config.yaml \
+          --data data/processed/feature_house_data.csv \
+          --models-dir models \
+          -mlflow-tracking-uri http://localhost:5555
+
+    - name: Cleaning up MLflow
+      run: |
+        docker stop mlflow-server
+        docker rm mlflow-server
+        docker rmi ghcr.io/mlflow/mlflow:latest

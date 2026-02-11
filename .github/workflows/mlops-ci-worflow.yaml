@@ -71,6 +71,6 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: enrigle/fastapi:{{ github.sha }}
+        tags: enrigle/fastapi:${{ github.sha }}
         context: .
         file: Dockerfile     
